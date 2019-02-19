@@ -1,7 +1,7 @@
 %Make a map showing the locations of the forest regions used.
 %
 %Dependencies:
-% - hansen_forested_frac_1deg_thres50.nc4 (calculated using XXXX)
+% - hansen_forested_frac_1deg_thres50.nc4 (calculated using hansen_forest_frac_calc.m)
 % - esa_forest_9regions_new_1deg_func.m
 %
 %T. Pugh

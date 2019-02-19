@@ -11,7 +11,7 @@ function [mdistc_tot_TrBE,mdistc_tot_TrBD,mdistc_tot_TeBE,mdistc_tot_TeBD,mdistc
 %Dependencies:
 % - lpj_to_grid_func_centre.m
 % - distforfrachan.m
-% - hansen_forested_frac_1deg_thres50.nc4 (calculated using XXXX)
+% - hansen_forested_frac_1deg_thres50.nc4 (calculated using hansen_forest_frac_calc.m)
 % - esa_forest_9regions_new_1deg_func.m
 % - global_grid_area_1deg.m
 %

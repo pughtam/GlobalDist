@@ -3,7 +3,7 @@
 %Also output the young forest fractions to a *.mat file for use by other scripts.
 %
 %Dependencies:
-% - hansen_forested_frac_1deg_thres50.nc4 (calculated using XXXX)
+% - hansen_forested_frac_1deg_thres50.nc4 (calculated using hansen_forest_frac_calc.m)
 % - *.mat file from hansen_disturb_int_calc_1deg_lu_v4_lossyear.m
 %
 %T. Pugh

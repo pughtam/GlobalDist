@@ -5,7 +5,7 @@
 %
 %Dependencies:
 % - esa_forest_9regions_new_1deg_func.m
-% - hansen_forested_frac_1deg_thres50.nc4 (calculated using XXXX)
+% - hansen_forested_frac_1deg_thres50.nc4 (calculated using hansen_forest_frac_calc.m)
 % - global_grid_area_1deg.m
 %
 %T. Pugh

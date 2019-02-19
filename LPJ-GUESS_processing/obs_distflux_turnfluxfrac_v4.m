@@ -9,7 +9,7 @@
 %1 degree regional calculations in dist_loss_maps_esa_all_v3.m.
 %
 %Dependencies:
-% - hansen_forested_frac_1deg_thres50.nc4 (calculated using XXXX)
+% - hansen_forested_frac_1deg_thres50.nc4 (calculated using hansen_forest_frac_calc.m)
 % - global_grid_area_1deg.m
 % - esa_forest_9regions_new_func.m
 %

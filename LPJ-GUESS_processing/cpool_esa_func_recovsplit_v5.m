@@ -16,7 +16,7 @@ function [vegc_tot_reg_dlow,vegc_tot_dlow,soilc_tot_reg_dlow,soilc_tot_dlow,...
 %Dependencies:
 % - distforfrachan.m
 % - lpj_to_grid_func_centre.m
-% - hansen_forested_frac_1deg_thres50.nc4 (calculated using XXXX)
+% - hansen_forested_frac_1deg_thres50.nc4 (calculated using hansen_forest_frac_calc.m)
 % - *.mat file from hansen_disturb_int_calc_1deg_lu_v4_lossyear.m
 % - global_grid_area_1deg.m
 %

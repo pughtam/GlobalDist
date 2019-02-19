@@ -4,7 +4,7 @@
 %Dependencies:
 % - *.mat files from hansen_disturb_int_calc_1deg_lu_v4_lossyear.m
 % calculated with a range of different values for lossyear
-% - hansen_forested_frac_1deg_thres50.nc4 (calculated using XXXX)
+% - hansen_forested_frac_1deg_thres50.nc4 (calculated using hansen_forest_frac_calc.m)
 % - esa_forest_9regions_new_1deg_func.m
 %
 %T. Pugh

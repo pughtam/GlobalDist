@@ -4,7 +4,7 @@ function [maskarea,fmask]=distforfrachan(file_in)
 %canopy coverage in 1km gridcell being the basis for assessing forest coverage).
 %
 %Dependencies:
-% - hansen_forested_frac_1deg_thres50.nc4 (calculated using XXXX)
+% - hansen_forested_frac_1deg_thres50.nc4 (calculated using hansen_forest_frac_calc.m)
 %
 %T. Pugh
 %07.04.17

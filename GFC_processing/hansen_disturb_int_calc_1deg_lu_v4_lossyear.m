@@ -10,7 +10,7 @@
 %
 %Dependencies:
 % - *.mat file for land-use change from ESA_forest_loss_process.m
-% - hansen_forested_frac_1deg_thres50.nc4 (calculated using XXXX)
+% - hansen_forested_frac_1deg_thres50.nc4 (calculated using hansen_forest_frac_calc.m)
 %
 %T. Pugh
 %29.01.19
@@ -411,6 +411,34 @@ if makeplots
     c1=colorbar;
     caxis([-1e9 1e9])
     colormap(redblue)
+    set(gca,'XTick',[-120 -60 0 60 120],'XTickLabel','')
+    set(gca,'YTick',[-60 -30 0 30 60],'YTickLabel','')
+    
+    %Compare tau with and without the land-use change correction
+    figure
+    subplot(2,1,1)
+    p1=pcolor(-180.0:1:179.0,-90.0:1:89.0,log10(tau_d_1deg_maskhigh'));
+    set(p1,'linestyle','none')
+    load coast
+    longn=[long;NaN]; latn=[lat;NaN]; %Add a NaN on the end of the arrays to avoid joining the first and last points of the coastlines
+    patch(longn,latn,ones(length(longn),1));
+    set(gca,'YLim',[-60 80])
+    c1=colorbar;
+    set(c1,'Ticks',log10([10 30 100 300 1000]))
+    set(c1,'TickLabels',10.^get(c1,'Ticks'))
+    caxis([1 3])
+    set(gca,'XTick',[-120 -60 0 60 120],'XTickLabel','')
+    set(gca,'YTick',[-60 -30 0 30 60],'YTickLabel','')
+    
+    subplot(2,1,2)
+    p1=pcolor(-180.0:1:179.0,-90.0:1:89.0,tau_d_1deg_lucorr_maskhigh'-tau_d_1deg_maskhigh');
+    set(p1,'linestyle','none')
+    load coast
+    longn=[long;NaN]; latn=[lat;NaN]; %Add a NaN on the end of the arrays to avoid joining the first and last points of the coastlines
+    patch(longn,latn,ones(length(longn),1));
+    set(gca,'YLim',[-60 80])
+    c1=colorbar;
+    caxis([0 400])
     set(gca,'XTick',[-120 -60 0 60 120],'XTickLabel','')
     set(gca,'YTick',[-60 -30 0 30 60],'YTickLabel','')
 end
