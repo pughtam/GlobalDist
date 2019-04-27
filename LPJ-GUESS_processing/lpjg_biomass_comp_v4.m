@@ -8,14 +8,15 @@
 % - hansen_forested_frac_1deg_thres50.nc4 (calculated using hansen_forest_frac_calc.m)
 %
 %T. Pugh
-%11.02.19
+%27.04.19
 
 datafol='/Users/pughtam/Documents/GAP_work/Disturbance/netcdfs_for_deposition/';
 
 lpjg_base_file='Cveg_LPJ-GUESS_100yplusfire_default_1x_p100.nc';
 lpjg_han_file='Cveg_LPJ-GUESS_standard_dist2litter_1x_p100.nc';
 
-biomassdata='/Users/pughtam/data/Avitabile_AGB_Map/GEOCARBON_Global_Forest_Biomass/GEOCARBON_Global_Forest_AGB_10072015.tif';
+GEOCARBON_biomassdata='/Users/pughtam/data/Avitabile_AGB_Map/GEOCARBON_Global_Forest_Biomass/GEOCARBON_Global_Forest_AGB_10072015.tif';
+Thurner_biomassdata='/Users/pughtam/data/Thurner_biomass/2019212192638biomass_v3_total.nc';
 use_fmask=false; %Mask to Hansen et al. (2013) forest cover (only for map coverage, no scaling)
 
 usesaatchiBGBcorr=true; %Use the BGB calculation given in Saatch et al. (2011). Else use a simple ratio from IPCC
@@ -36,8 +37,9 @@ ton_to_kg=1000;
 DM_to_C=0.5;
 AGB_BGB_ratio=0.75; %Based on Annex 3A.1, Table 3A.1.8 in the IPCC LUCF Sector Good Practice Guidelines
 
-%Read Vegetation C from observations
-[AGB_in, Rc]=geotiffread(biomassdata);
+%---
+%Read AGB from GEOCARBON
+[AGB_in, Rc]=geotiffread(GEOCARBON_biomassdata);
 AGB_in=flipud(AGB_in);
 minlatc=Rc.LatitudeLimits(1);
 maxlatc=Rc.LatitudeLimits(2);
@@ -87,6 +89,32 @@ if usesaatchiBGBcorr
 else
     cveg_05=AGB_05*DM_to_C/AGB_BGB_ratio;
 end
+
+%Read in Thurner et al. total biomass data (above and below-ground) for northern regions in kg C m-2
+B_Thurner=ncread(Thurner_biomassdata,'biomass_total');
+B_Thurner=flip(B_Thurner,2);
+
+%Regrid to 0.5 degrees
+%First trim values outside of the nearest integer degree
+nlatcell=50;
+nloncell=50;
+AGBT_05=NaN(360,720);
+for ii=1:720 
+    for jj=240:339 %30 to 80 degrees
+        jjc=jj-239;
+        iic=ii;
+        indlat_s=(jjc*nlatcell)-nlatcell+1;
+        indlat_e=jjc*nlatcell;
+        indlon_s=(iic*nloncell)-nloncell+1;
+        indlon_e=iic*nloncell;
+        temp=B_Thurner(indlon_s:indlon_e,indlat_s:indlat_e);
+        AGBT_05(jj,ii)=nanmean(temp(:));
+        clear temp
+    end
+end
+
+%Now merge the GEOCARBON and Thurner datasets, preferring Thurner where it has data
+cveg_05(isfinite(AGBT_05))=AGBT_05(isfinite(AGBT_05));
 
 %----
 %Mask data

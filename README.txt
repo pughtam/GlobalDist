@@ -25,7 +25,7 @@ Scripts associated with individual figures
 Fig. 2
 -	dist_loss_maps_esa_all_v3.m
 -	dist_loss_maps_esa_func_v3.m
--	obs_distflux_turnfluxfrac_v4.m (observation-based cross-check)
+-	obs_distflux_turnfluxfrac_v5.m (observation-based cross-check)
 
 Fig. 3a
 -	conceptual_dist_sims_v2.m
@@ -59,7 +59,7 @@ Suppl. Fig. 10
 -	esa_regions_map_v2.m
 
 Suppl. Fig. 11
--	lpjg_biomass_comp_v3.m
+-	lpjg_biomass_comp_v4.m
 
 Other checks
 -	han_tau_uncer_bootstrap_sample_fig.m

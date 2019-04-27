@@ -22,7 +22,8 @@ usesaatchiBGBcorr=true; %Use the BGB calculation given in Saatch et al. (2011). 
 
 datafol='/Users/pughtam/Documents/GAP_work/Disturbance/netcdfs_for_deposition/';
 intdatafol='/Users/pughtam/Documents/GAP_work/Disturbance/intermediate_processing/';
-biomassdata='/Users/pughtam/data/Avitabile_AGB_Map/GEOCARBON_Global_Forest_Biomass/GEOCARBON_Global_Forest_AGB_10072015.tif';
+GEOCARBON_biomassdata='/Users/pughtam/data/Avitabile_AGB_Map/GEOCARBON_Global_Forest_Biomass/GEOCARBON_Global_Forest_AGB_10072015.tif';
+Thurner_biomassdata='/Users/pughtam/data/Thurner_biomass/2019212192638biomass_v3_total.nc';
 modisfol='/Users/pughtam/data/modis_gpp/';
 addpath('/Users/pughtam/data/ESA_landcover')
 
@@ -39,8 +40,9 @@ ton_to_kg=1000;
 DM_to_C=0.5;
 AGB_BGB_ratio=0.75; %Based on Annex 3A.1, Table 3A.1.8 in the IPCC LUCF Sector Good Practice Guidelines
 
-%Read Vegetation C from observations
-[AGB_in, Rc]=geotiffread(biomassdata);
+%---
+%Read AGB from GEOCARBON
+[AGB_in, Rc]=geotiffread(GEOCARBON_biomassdata);
 AGB_in=flipud(AGB_in);
 minlatc=Rc.LatitudeLimits(1);
 maxlatc=Rc.LatitudeLimits(2);
@@ -91,7 +93,33 @@ else
     cveg_05=AGB_05*DM_to_C/AGB_BGB_ratio;
 end
 
+%Read in Thurner et al. total biomass data (above and below-ground) for northern regions in kg C m-2
+B_Thurner=ncread(Thurner_biomassdata,'biomass_total');
+B_Thurner=flip(B_Thurner,2);
 
+%Regrid to 0.5 degrees
+%First trim values outside of the nearest integer degree
+nlatcell=50;
+nloncell=50;
+AGBT_05=NaN(360,720);
+for ii=1:720 
+    for jj=240:339 %30 to 80 degrees
+        jjc=jj-239;
+        iic=ii;
+        indlat_s=(jjc*nlatcell)-nlatcell+1;
+        indlat_e=jjc*nlatcell;
+        indlon_s=(iic*nloncell)-nloncell+1;
+        indlon_e=iic*nloncell;
+        temp=B_Thurner(indlon_s:indlon_e,indlat_s:indlat_e);
+        AGBT_05(jj,ii)=nanmean(temp(:));
+        clear temp
+    end
+end
+
+%Now merge the GEOCARBON and Thurner datasets, preferring Thurner where it has data
+cveg_05(isfinite(AGBT_05))=AGBT_05(isfinite(AGBT_05));
+
+%---
 %Get NPP from MODIS for 2001-2010
 modis_file={'MOD17A3_Science_NPP_2001.tif','MOD17A3_Science_NPP_2002.tif','MOD17A3_Science_NPP_2003.tif',...
     'MOD17A3_Science_NPP_2004.tif','MOD17A3_Science_NPP_2005.tif','MOD17A3_Science_NPP_2006.tif','MOD17A3_Science_NPP_2007.tif',...
