@@ -1,9 +1,9 @@
-Scripts associated with Pugh et al., Dominant role of disturbance in global forest biomass turnover and carbon sinks
+Scripts associated with Pugh et al., Important role of forest disturbances for global biomass turover and carbon sinks
  
 
 Calculate disturbance return periods and make Fig. 1, Suppl. Fig. 5., Suppl. Fig. 7
 -	hansen_disturb_int_calc_1deg_lu_v4_lossyear.m
--	BOXPLOT SCRIPT
+-	hansen_joint_boxplot_v4.m
 
 Calculate the conversions from forest to non-forest land-use using ESA CCI Landcover
 -	ESA_forest_loss_process.m
@@ -64,3 +64,11 @@ Suppl. Fig. 11
 Other checks
 -	han_tau_uncer_bootstrap_sample_fig.m
 
+
+Scripts to make netcdf files of tau outputs for archiving
+-	tau_to_netcdf.m
+-	write_netcdf_tau.m
+
+Scripts to convert raw LPJ-GUESS outputs into those for archiving and use by the scripts above
+-	lpjg_to_netcdf.m
+-	write_netcdf_lpjg.m
