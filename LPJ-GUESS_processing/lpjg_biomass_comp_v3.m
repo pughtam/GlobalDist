@@ -10,11 +10,12 @@
 %T. Pugh
 %11.02.19
 
-lpjg_base_folder='/media/pughtam/rds-2017-pughtam-01/Disturbance/v3/100flat/postproc/';
-lpjg_han_folder='/media/pughtam/rds-2017-pughtam-treemort/hansen_esaLUcorr_p100/postproc/';
-cpool_file='cpool_2001_2014';
-cveg_col=1; %Column in cpool_file that relates to CVeg
-biomass_file='/data/general_data/Avitabile_AGB_Map/GEOCARBON_Global_Forest_Biomass/GEOCARBON_Global_Forest_AGB_10072015.tif';
+datafol='/Users/pughtam/Documents/GAP_work/Disturbance/netcdfs_for_deposition/';
+
+lpjg_base_file='Cveg_LPJ-GUESS_100yplusfire_default_1x_p100.nc';
+lpjg_han_file='Cveg_LPJ-GUESS_standard_dist2litter_1x_p100.nc';
+
+biomassdata='/Users/pughtam/data/Avitabile_AGB_Map/GEOCARBON_Global_Forest_Biomass/GEOCARBON_Global_Forest_AGB_10072015.tif';
 use_fmask=false; %Mask to Hansen et al. (2013) forest cover (only for map coverage, no scaling)
 
 usesaatchiBGBcorr=true; %Use the BGB calculation given in Saatch et al. (2011). Else use a simple ratio from IPCC
@@ -22,11 +23,9 @@ usesaatchiBGBcorr=true; %Use the BGB calculation given in Saatch et al. (2011). 
 %---
 %Read LPJ-GUESS data
 
-cpool_in=lpj_to_grid_func_centre([lpjg_base_folder,cpool_file],1,0);
-cveg_base_lpjg=squeeze(cpool_in(:,:,cveg_col));
-cpool_in=lpj_to_grid_func_centre([lpjg_han_folder,cpool_file],1,0);
-cveg_han_lpjg=squeeze(cpool_in(:,:,cveg_col));
-clear cpool_in
+cveg_base_lpjg=ncread([datafol,'/lpjg/',lpjg_base_file],'Cveg')'; %Vegetation C
+cveg_han_lpjg=ncread([datafol,'/lpjg/',lpjg_han_file],'Cveg')'; %Vegetation C
+
 cveg_base_lpjg(cveg_base_lpjg==0)=NaN;
 cveg_han_lpjg(cveg_han_lpjg==0)=NaN;
 
@@ -38,7 +37,7 @@ DM_to_C=0.5;
 AGB_BGB_ratio=0.75; %Based on Annex 3A.1, Table 3A.1.8 in the IPCC LUCF Sector Good Practice Guidelines
 
 %Read Vegetation C from observations
-[AGB_in, Rc]=geotiffread(biomass_file);
+[AGB_in, Rc]=geotiffread(biomassdata);
 AGB_in=flipud(AGB_in);
 minlatc=Rc.LatitudeLimits(1);
 maxlatc=Rc.LatitudeLimits(2);
