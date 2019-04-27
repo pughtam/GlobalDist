@@ -4,7 +4,8 @@ function [vegc_tot_reg_dlow,vegc_tot_dlow,soilc_tot_reg_dlow,soilc_tot_dlow,...
     vegc_tot_reg_std_dlow,vegc_tot_std_dlow,soilc_tot_reg_std_dlow,soilc_tot_std_dlow,...
     vegc_tot_reg_std_dmid,vegc_tot_std_dmid,soilc_tot_reg_std_dmid,soilc_tot_std_dmid,...
     vegc_tot_reg_std_dhigh,vegc_tot_std_dhigh,soilc_tot_reg_std_dhigh,soilc_tot_std_dhigh,...
-    vegc,soilc,N_reg_dlow_sum,N_reg_dmid_sum,N_reg_dhigh_sum]=cpool_esa_func_recovsplit_v5(base_folder_name,tau_thres_90,tau_thres_80,calcmean)
+    vegc,soilc,N_reg_dlow_sum,N_reg_dmid_sum,N_reg_dhigh_sum]=cpool_esa_func_recovsplit_v5(datafol,intdatafol,...
+        vegcfile,soilcfile,littercfile,fpctreefile,fpcgrassfile,tau_thres_90,tau_thres_80,calcmean)
 %Calculate the C pool sizes for a specific time period for one simulation. Calculations only include
 %forest areas as defined by Hansen et al. (2013). 
 %
@@ -15,7 +16,6 @@ function [vegc_tot_reg_dlow,vegc_tot_dlow,soilc_tot_reg_dlow,soilc_tot_dlow,...
 %
 %Dependencies:
 % - distforfrachan.m
-% - lpj_to_grid_func_centre.m
 % - hansen_forested_frac_1deg_thres50.nc4 (calculated using hansen_forest_frac_calc.m)
 % - *.mat file from hansen_disturb_int_calc_1deg_lu_v4_lossyear.m
 % - global_grid_area_1deg.m
@@ -23,28 +23,11 @@ function [vegc_tot_reg_dlow,vegc_tot_dlow,soilc_tot_reg_dlow,soilc_tot_dlow,...
 %T. Pugh
 %12.09.17
 
-cpoolfile=[base_folder_name,'/cpool_2001_2014'];
-fpcfile=[base_folder_name,'/fpc_2001_2014'];
-
-minlat=-89.5;
-maxlat=89.5;
-minlon=-179.5;
-maxlon=179.5;
-gridsize=1;
-lonc=minlon:gridsize:maxlon;
-latc=minlat:gridsize:maxlat;
-[lons,lats]=meshgrid(lonc,latc);
-
-%----
-%Business section
-
-cpool_in=squeeze(lpj_to_grid_func_centre(cpoolfile,1,0));
-vegc=cpool_in(:,:,1);
-soilc=sum(cpool_in(:,:,2:3),3);
-clear cpoolfile cflux_in
+vegc=ncread([datafol,'/lpjg/',vegcfile],'Cveg')'; %Vegetation C
+soilc=ncread([datafol,'/lpjg/',soilcfile],'Csoil')'+ncread([datafol,'/lpjg/',littercfile],'Clitter')'; %Soil and litter C
 
 %Exclude gridcells with less than 25% tree cover
-[maskarea]=distforfrachan(fpcfile);
+[maskarea]=distforfrachan([datafol,'/lpjg/',fpctreefile],[datafol,'/lpjg/',fpcgrassfile]);
 vegc=vegc.*maskarea;
 soilc=soilc.*maskarea;
 
@@ -68,7 +51,7 @@ clear xx
 
 %Get gridcell areas
 %Calculate forest areas in each class
-fmask=(ncread('/data/Hansen_forest_change/hansen_forested_frac_1deg_thres50.nc4','forested_50_percent')');
+fmask=(ncread([datafol,'/forestmask/hansen_forested_frac_1deg_thres50.nc4'],'forested_50_percent')');
 gridarea=global_grid_area_1deg();
 gridarea=gridarea.*(double(fmask)/100);
 
@@ -89,8 +72,8 @@ clear nn
 %Load the relevant Hansen tau data from a mat file calculated with
 %hansen_disturb_int_calc_1deg_lu_v4.m
 
-load /data/Disturbance/input_processing/hansen_new_processing/hansen_disturb_int_calc_1deg_lu_v4_outarrays.mat
-%load /data/Disturbance/input_processing/hansen_new_processing/hansen_disturb_int_calc_1deg_lu_canarea_v4_outarrays.mat
+load([intdatafol,'/hansen_disturb_int_calc_1deg_lu_v4_outarrays.mat'])
+%load([intdatafol,'/hansen_disturb_int_calc_1deg_lu_canarea_v4_outarrays.mat])
 clear tau_d_1deg_lucorr_maskhigh_fill tau_d_1deg_lucorr_lower_maskhigh_fill tau_d_1deg_lucorr_upper_maskhigh_fill...
 tau_d_1deg_mask tau_d_1deg_lower_mask tau_d_1deg_upper_mask tau_d_1deg_lucorr_lower_mask tau_d_1deg_lucorr_upper_mask tau_d_1deg_maskhigh...
 tau_d_1deg_lower_maskhigh tau_d_1deg_upper_maskhigh esa_forloss_1deg...

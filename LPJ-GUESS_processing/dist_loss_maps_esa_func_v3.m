@@ -1,7 +1,7 @@
 function [mdistc_tot_TrBE,mdistc_tot_TrBD,mdistc_tot_TeBE,mdistc_tot_TeBD,mdistc_tot_BNE,mdistc_tot_BNS,mdistc_tot_MX,mdistc_tot,...
     mmortc_tot_TrBE,mmortc_tot_TrBD,mmortc_tot_TeBE,mmortc_tot_TeBD,mmortc_tot_BNE,mmortc_tot_BNS,mmortc_tot_MX,mmortc_tot,...
     mtotc_tot_TrBE,mtotc_tot_TrBD,mtotc_tot_TeBE,mtotc_tot_TeBD,mtotc_tot_BNE,mtotc_tot_BNS,mtotc_tot_MX,mtotc_tot,...
-    mdistc_1deg,mmortc_1deg,mtotc_1deg]=dist_loss_maps_esa_func_v3(base_folder_name,thres25)
+    mdistc_1deg,mmortc_1deg,mtotc_1deg]=dist_loss_maps_esa_func_v3(datafol,mdistcfile,omortcfile,lturncfile,rturncfile,reprocfile,fpctreefile,fpcgrassfile,thres25)
 %Calculate the C flux sizes for a specific time period for one simulation. Calculations only include
 %forest areas as defined by Hansen et al. (2013). Calculation are made at 1 degree resolution.
 %Reproduction flux included in total C turnover.
@@ -9,7 +9,6 @@ function [mdistc_tot_TrBE,mdistc_tot_TrBD,mdistc_tot_TeBE,mdistc_tot_TeBD,mdistc
 %Regions are defined by ESA landcovers.
 %
 %Dependencies:
-% - lpj_to_grid_func_centre.m
 % - distforfrachan.m
 % - hansen_forested_frac_1deg_thres50.nc4 (calculated using hansen_forest_frac_calc.m)
 % - esa_forest_9regions_new_1deg_func.m
@@ -18,30 +17,16 @@ function [mdistc_tot_TrBE,mdistc_tot_TrBD,mdistc_tot_TeBE,mdistc_tot_TeBD,mdistc
 %T. Pugh
 %03.08.18
 
-cfluxfile=[base_folder_name,'/cflux_2001_2014'];
-fpcfile=[base_folder_name,'/fpc_2001_2014'];
-
-minlat=-90.0;
-maxlat=89.5;
-minlon=-180.0;
-maxlon=179.5;
-gridsize=0.5;
-lonc=minlon:gridsize:maxlon;
-latc=minlat:gridsize:maxlat;
-[lons,lats]=meshgrid(lonc,latc);
-
-%----
-%Business section
-
-cflux_in=squeeze(lpj_to_grid_func_centre(cfluxfile,1,0));
-mdistc=cflux_in(:,:,14);
-mmortc=sum(cflux_in(:,:,6:14),3);
-mtotc=sum(cflux_in(:,:,6:16),3)+cflux_in(:,:,2); %Reproduction added also
-clear cfluxfile cflux_in
+mdistc=ncread([datafol,'/lpjg/',mdistcfile],'TdistC')'; %Disturbance mortality turnover
+omortc=ncread([datafol,'/lpjg/',omortcfile],'TmortC')'; %Other mortality turnover
+otherc=ncread([datafol,'/lpjg/',lturncfile],'TleafC')'+ncread([datafol,'/lpjg/',rturncfile],'TrootC')'+ncread([datafol,'/lpjg/',reprocfile],'TreproC')'; %Other turnover (leaf, fine root, reproduction)
+mmortc=mdistc+omortc; %Total mortality turnover
+mtotc=mmortc+otherc; %Total turnover
+clear omortc otherc
 
 %Exclude gridcells with less than 25% tree cover
 if thres25
-    [maskarea,~]=distforfrachan(fpcfile);
+    [maskarea,~]=distforfrachan([datafol,'/lpjg/',fpctreefile],[datafol,'/lpjg/',fpcgrassfile]);
     mdistc=mdistc.*maskarea;
     mmortc=mmortc.*maskarea;
     mtotc=mtotc.*maskarea;
@@ -70,7 +55,7 @@ clear xx
 
 %Get gridcell areas
 %Calculate forest areas in each class
-fmask=(ncread('/data/Hansen_forest_change/hansen_forested_frac_1deg_thres50.nc4','forested_50_percent')');
+fmask=(ncread([datafol,'/forestmask/hansen_forested_frac_1deg_thres50.nc4'],'forested_50_percent')');
 gridarea=global_grid_area_1deg();
 gridarea=gridarea.*(double(fmask)/100);
 

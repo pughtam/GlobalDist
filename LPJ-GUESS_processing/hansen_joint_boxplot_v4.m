@@ -8,12 +8,15 @@
 %T. Pugh
 %02.08.18
 
-%Load the relevant Hansen tau data from a mat file calculated with
-%hansen_disturb_int_calc_1deg_lu_v4_lossyear.m
-load /data/Disturbance/input_processing/hansen_new_processing/hansen_disturb_int_calc_1deg_lu_v4_outarrays.mat
+datafol='/Users/pughtam/Documents/GAP_work/Disturbance/netcdfs_for_deposition/';
+intdatafol='/Users/pughtam/Documents/GAP_work/Disturbance/intermediate_processing/';
+addpath('/data/ESA_landcover')
+
+%Load the relevant Hansen tau data from a mat file calculated with hansen_disturb_int_calc_1deg_lu_v4_lossyear.m
+load([intdatafol,'/hansen_disturb_int_calc_1deg_lu_v4_outarrays.mat'])
 clear tau_d_1deg_lucorr_maskhigh_fill tau_d_1deg_lucorr_lower_maskhigh_fill tau_d_1deg_lucorr_upper_maskhigh_fill...
 tau_d_1deg_mask tau_d_1deg_lower_mask tau_d_1deg_upper_mask tau_d_1deg_lucorr_lower_mask tau_d_1deg_lucorr_upper_mask tau_d_1deg_maskhigh...
-tau_d_1deg_lower_maskhigh tau_d_1deg_upper_maskhigh esa_forloss_1deg...
+tau_d_1deg_lower_maskhigh tau_d_1deg_upper_maskhigh esa_forloss_1deg tau_d_1deg_lucorr_mask...
 esa_forloss_area_lower_1deg esa_forloss_area_upper_1deg totloss_1deg_thres50 totloss_1deg_thres50_lower totloss_1deg_thres50_upper totlosscan_1deg_thres50...
 totlosscan_1deg_thres50_lower totlosscan_1deg_thres50_upper
 tau_d_1deg_lucorr_maskhigh=tau_d_1deg_lucorr_maskhigh';

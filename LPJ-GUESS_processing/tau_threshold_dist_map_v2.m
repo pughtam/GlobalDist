@@ -13,7 +13,7 @@
 
 conflevel_tau=2; %Which percentile to use for the tau, 1=2.5th, 2=50th, 3=97.5th
 conflevel_line=2; %Which percentile to use for the line fitting, 1=2.5th, 2=50th, 3=97.5th
-makeplot=false;
+makeplot=true;
 
 %Values for tau threshold calculated by biome using dist_vul_sim_v3.m
 %For OTr and Other, adopt the range across the biomes from the global fit as the
@@ -25,6 +25,9 @@ tau_thres_90_max=[554 445 457 261 393 394 311 382 457];
 tau_thres_80=[289 218 206 125 96 203 178 187 206];
 tau_thres_80_min=[278 171 201 114 50 195 171 175 201];
 tau_thres_80_max=[303 252 211 138 130 213 184 196 211]; 
+
+datafol='/Users/pughtam/Documents/GAP_work/Disturbance/netcdfs_for_deposition/';
+intdatafol='/Users/pughtam/Documents/GAP_work/Disturbance/intermediate_processing/';
 
 %---
 %Create Threshold tau maps
@@ -54,8 +57,8 @@ clear nn
 
 %Load the relevant Hansen tau data from a mat file calculated with hansen_disturb_int_calc_1deg_lu_v4_lossyear.m
 
-load /data/Disturbance/input_processing/hansen_new_processing/hansen_disturb_int_calc_1deg_lu_v4_outarrays.mat
-%load /data/Disturbance/input_processing/hansen_new_processing/hansen_disturb_int_calc_1deg_lu_canarea_v4_outarrays.mat
+load([intdatafol,'/hansen_disturb_int_calc_1deg_lu_v4_outarrays.mat'])
+%load([intdatafol,'/hansen_disturb_int_calc_1deg_lu_canarea_v4_outarrays.mat'])
 clear tau_d_1deg_lucorr_maskhigh_fill tau_d_1deg_lucorr_lower_maskhigh_fill tau_d_1deg_lucorr_upper_maskhigh_fill...
 tau_d_1deg_mask tau_d_1deg_lower_mask tau_d_1deg_upper_mask tau_d_1deg_lucorr_lower_mask tau_d_1deg_lucorr_upper_mask tau_d_1deg_maskhigh...
 tau_d_1deg_lower_maskhigh tau_d_1deg_upper_maskhigh esa_forloss_1deg...
@@ -125,7 +128,7 @@ if makeplot
 end
 
 %Calculate forest areas in each class
-fmask=(ncread('/data/Hansen_forest_change/hansen_forested_frac_1deg_thres50.nc4','forested_50_percent')');
+fmask=(ncread([datafol,'forestmask/hansen_forested_frac_1deg_thres50.nc4'],'forested_50_percent')');
 fmask=double(fmask)./100;
 fmask_thres=NaN(size(fmask));
 fmask_thres(fmask>0.25)=1;

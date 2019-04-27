@@ -18,10 +18,19 @@
 
 thres25=false; %Whether or not to apply the 25% forest cover threshold per gridcell (note implicit 5% threshold is included in the model gridlist for the simulations)
 
-hansen_file='/data/Disturbance/input_processing/tau_d_hansen_LUcorr_5perc_esacorr_filled.txt';
-dist_han=lpj_to_grid_func_centre(hansen_file,1,0);
-
 usesaatchiBGBcorr=true; %Use the BGB calculation given in Saatch et al. (2011). Else use a simple ratio from IPCC
+
+datafol='/Users/pughtam/Documents/GAP_work/Disturbance/netcdfs_for_deposition/';
+intdatafol='/Users/pughtam/Documents/GAP_work/Disturbance/intermediate_processing/';
+biomassdata='/Users/pughtam/data/Avitabile_AGB_Map/GEOCARBON_Global_Forest_Biomass/GEOCARBON_Global_Forest_AGB_10072015.tif';
+modisfol='/Users/pughtam/data/modis_gpp/';
+addpath('/Users/pughtam/data/ESA_landcover')
+
+%---
+%Get the disturbance interval data
+
+hansen_file=[intdatafol,'/tau_d_hansen_LUcorr_5perc_esacorr_filled.txt'];
+dist_han=lpj_to_grid_func_centre(hansen_file,1,0);
 
 %---
 %Set some basic constants
@@ -31,7 +40,7 @@ DM_to_C=0.5;
 AGB_BGB_ratio=0.75; %Based on Annex 3A.1, Table 3A.1.8 in the IPCC LUCF Sector Good Practice Guidelines
 
 %Read Vegetation C from observations
-[AGB_in, Rc]=geotiffread('/data/general_data/Avitabile_AGB_Map/GEOCARBON_Global_Forest_Biomass/GEOCARBON_Global_Forest_AGB_10072015.tif');
+[AGB_in, Rc]=geotiffread(biomassdata);
 AGB_in=flipud(AGB_in);
 minlatc=Rc.LatitudeLimits(1);
 maxlatc=Rc.LatitudeLimits(2);
@@ -84,12 +93,12 @@ end
 
 
 %Get NPP from MODIS for 2001-2010
-modis_file={'MOD17A3_Science_NPP_2001.tif','MOD17A3_Science_NPP_2001.tif','MOD17A3_Science_NPP_2002.tif','MOD17A3_Science_NPP_2003.tif',...
+modis_file={'MOD17A3_Science_NPP_2001.tif','MOD17A3_Science_NPP_2002.tif','MOD17A3_Science_NPP_2003.tif',...
     'MOD17A3_Science_NPP_2004.tif','MOD17A3_Science_NPP_2005.tif','MOD17A3_Science_NPP_2006.tif','MOD17A3_Science_NPP_2007.tif',...
-    'MOD17A3_Science_NPP_2008.tif','MOD17A3_Science_NPP_2010.tif'};
+    'MOD17A3_Science_NPP_2008.tif','MOD17A3_Science_NPP_2009.tif','MOD17A3_Science_NPP_2010.tif'};
 npp_05=NaN(360,720,length(modis_file));
 for nn=1:length(modis_file)
-    [npp, Rg]=geotiffread(['/data/modis_gpp/',modis_file{nn}]);
+    [npp, Rg]=geotiffread([modisfol,'/',modis_file{nn}]);
     npp=flipud(npp);
     minlatg=Rg.LatitudeLimits(1);
     maxlatg=Rg.LatitudeLimits(2);
@@ -123,7 +132,7 @@ clear npp_05
 npp_mod_05_clean=npp_mod_05;
 npp_mod_05_clean(npp_mod_05>6)=NaN;
 
-fmask=ncread('/media/pughtam/rds-2017-pughtam-01/Disturbance/hansen_forested_frac_05.nc4','forested_50_percent')';
+fmask=ncread([datafol,'/forestmask/hansen_forested_frac_05.nc4'],'forested_50_percent')';
 %Find gridcells with forest cover >25%
 fmask_thres=NaN(size(fmask));
 fmask_thres(fmask>25)=1;
@@ -139,7 +148,6 @@ end
 clear garea
 
 %Get ESA landcovers
-addpath('/data/ESA_landcover')
 [rmask,regions,nregion]=esa_forest_9regions_new_func(false);
 
 %Estimate turnover flux due to mortality in Pg C a-1

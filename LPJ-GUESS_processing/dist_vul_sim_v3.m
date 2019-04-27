@@ -9,9 +9,18 @@
 %T. Pugh
 %03.08.18
 
-cpool_h_1x_dir='/media/pughtam/rds-2017-pughtam-treemort/hansen_esaLUcorr_p100/postproc';
-cpool_h_0_5x_dir='/media/pughtam/rds-2017-pughtam-01/Disturbance/v3/hansen_esaLUcorr_0_5x_p100/postproc/';
-distdata_h='/data/Disturbance/input_processing/tau_d_hansen_LUcorr_5perc_esacorr_filled.txt';
+datafol='/Users/pughtam/Documents/GAP_work/Disturbance/netcdfs_for_deposition/';
+intdatafol='/Users/pughtam/Documents/GAP_work/Disturbance/intermediate_processing/';
+
+cveg_1x_file='Cveg_LPJ-GUESS_standard_dist2litter_1x_p100.nc';
+cveg_0_5x_file='Cveg_LPJ-GUESS_standard_dist2litter_0p5x_p100.nc';
+
+fpc_tree_1x_file='fpc_tree_LPJ-GUESS_standard_dist2litter_1x_p100.nc';
+fpc_grass_1x_file='fpc_grass_LPJ-GUESS_standard_dist2litter_1x_p100.nc';
+
+distfile='tau_d_hansen_LUcorr_5perc_esacorr_filled.txt';
+
+addpath('/data/ESA_landcover')
 
 %---
 minlat=-90.0;
@@ -23,36 +32,34 @@ lonc=minlon:gridsize:maxlon;
 latc=minlat:gridsize:maxlat;
 
 %Read biomass data
-cpool_h_1x_in=lpj_to_grid_func_centre([cpool_h_1x_dir,'/cpool_2001_2014'],1,0);
-cveg_h_1x=squeeze(cpool_h_1x_in(:,:,1));
-cpool_h_0_5x_in=lpj_to_grid_func_centre([cpool_h_0_5x_dir,'/cpool_2001_2014'],1,0);
-cveg_h_0_5x=squeeze(cpool_h_0_5x_in(:,:,1));
+cveg_1x=ncread([datafol,'/lpjg/',cveg_1x_file],'Cveg')';
+cveg_0_5x=ncread([datafol,'/lpjg/',cveg_0_5x_file],'Cveg')';
 
 %Read disturbance data
-cdist_h_1x=lpj_to_grid_func_centre(distdata_h,1,0);
+cdist_1x=lpj_to_grid_func_centre([intdatafol,'/',distfile],1,0);
 
 %Mask data to forested area
-[maskarea_h]=distforfrachan([cpool_h_1x_dir,'/fpc_2001_2014']);
-cveg_h_1x=cveg_h_1x.*maskarea_h;
-cveg_h_0_5x=cveg_h_0_5x.*maskarea_h;
-cdist_h_1x=cdist_h_1x.*maskarea_h;
+[maskarea]=distforfrachan([datafol,'/lpjg/',fpc_tree_1x_file],[datafol,'/lpjg/',fpc_grass_1x_file]);
+cveg_1x=cveg_1x.*maskarea;
+cveg_0_5x=cveg_0_5x.*maskarea;
+cdist_1x=cdist_1x.*maskarea;
 
 %Aggregate to 1 degree (to increase effective patch number and make consistent with disturbance information resolution)
-cveg_h_1x_1deg=NaN(180,360);
-cveg_h_0_5x_1deg=NaN(180,360);
-cdist_h_1x_1deg=NaN(180,360);
+cveg_1x_1deg=NaN(180,360);
+cveg_0_5x_1deg=NaN(180,360);
+cdist_1x_1deg=NaN(180,360);
 for xx=1:360
     for yy=1:180
         ind_x=(xx*2)-1;
         ind_y=(yy*2)-1;
         
-        temp_h_1x=cveg_h_1x(ind_y:ind_y+1,ind_x:ind_x+1);
-        temp_h_0_5x=cveg_h_0_5x(ind_y:ind_y+1,ind_x:ind_x+1);
-        tempdist_h_1x=cdist_h_1x(ind_y:ind_y+1,ind_x:ind_x+1);
-        cveg_h_1x_1deg(yy,xx)=nanmean(temp_h_1x(:));
-        cveg_h_0_5x_1deg(yy,xx)=nanmean(temp_h_0_5x(:));
-        cdist_h_1x_1deg(yy,xx)=nanmean(tempdist_h_1x(:));
-        clear temp_h_1x temp_h_0_5x
+        temp_1x=cveg_1x(ind_y:ind_y+1,ind_x:ind_x+1);
+        temp_0_5x=cveg_0_5x(ind_y:ind_y+1,ind_x:ind_x+1);
+        tempdist_1x=cdist_1x(ind_y:ind_y+1,ind_x:ind_x+1);
+        cveg_1x_1deg(yy,xx)=nanmean(temp_1x(:));
+        cveg_0_5x_1deg(yy,xx)=nanmean(temp_0_5x(:));
+        cdist_1x_1deg(yy,xx)=nanmean(tempdist_1x(:));
+        clear temp_1x temp_0_5x
         clear ind_x ind_y
     end
     clear yy
@@ -62,22 +69,18 @@ clear xx
 %If doubling disturbance reduces Cveg below a threshold fraction of its
 %original value mark it as such
 
-cveg_reduc_frac_h=cveg_h_0_5x_1deg./cveg_h_1x_1deg; %Relative
+cveg_reduc_frac=cveg_0_5x_1deg./cveg_1x_1deg; %Relative
 
 %Remove NaN values ready for scatter plots
-nanvals_h=find(isnan(cdist_h_1x_1deg(:))==0 & isnan(cveg_reduc_frac_h(:))==0 & cdist_h_1x_1deg(:)>0);
+nanvals=find(isnan(cdist_1x_1deg(:))==0 & isnan(cveg_reduc_frac(:))==0 & cdist_1x_1deg(:)>0);
 
-xxx_h=cdist_h_1x_1deg(nanvals_h);
-yyy_h=-(1-cveg_reduc_frac_h(nanvals_h))*100; %Convert to a percentage loss
+xxx=cdist_1x_1deg(nanvals);
+yyy=-(1-cveg_reduc_frac(nanvals))*100; %Convert to a percentage loss
 
 %---
 %Make scatter plot by biome
 [rmask,regions,nregion]=esa_forest_9regions_new_1deg_func(false);
-rrr_h=rmask(nanvals_h);
-
-xxx=xxx_h;
-yyy=yyy_h;
-rrr=rrr_h;
+rrr=rmask(nanvals);
 
 %---
 %Version 1: Subplot for each forest type, bootstrapping for each line.
