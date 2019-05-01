@@ -1,4 +1,4 @@
-Scripts associated with Pugh et al., Important role of forest disturbances for global biomass turover and carbon sinks
+Scripts associated with Pugh et al., Important role of forest disturbances in global biomass turover and carbon sinks
  
 
 Calculate disturbance return periods and make Fig. 1, Suppl. Fig. 5., Suppl. Fig. 7
@@ -30,13 +30,13 @@ Fig. 2
 Fig. 3a
 -	conceptual_dist_sims_v2.m
 
-Fig. 3b, Suppl. Fig. 12
+Fig. 3b, Suppl. Fig. 13
 -	dist_vul_sim_v3.m
 
 Fig. 3c
 -	tau_threshold_dist_map_v2
 
-Fig. 3d,e, Suppl. Figs. 8, 9
+Fig. 3d,e, Suppl. Figs. 9, 10
 -	cpool_esa_line_recovsplit_v5.m
 -	cpool_esa_func_recovsplit_v5.m
 
@@ -55,10 +55,14 @@ Suppl. Fig. 4
 Suppl. Fig. 6
 -	han_tau_lossyear_check_v2.m
 
-Suppl. Fig. 10
--	esa_regions_map_v2.m
+Suppl. Fig. 8
+-   han_tau_bias.m
+-   ecozone_fao.m
 
 Suppl. Fig. 11
+-	esa_regions_map_v2.m
+
+Suppl. Fig. 12
 -	lpjg_biomass_comp_v4.m
 
 Other checks
